@@ -5,7 +5,7 @@ import { generateDetailedReport, generateMarketingRoadmap } from '../services/ge
 import { 
   TrendingUp, TrendingDown, DollarSign, MousePointer, 
   Target, BarChart2, FileText, Loader2, RefreshCw, AlertOctagon, Download,
-  Coins, BrainCircuit, Wrench, CheckCircle, ListChecks, Copy, LineChart, Gauge, Clock, Funnel, Map, Flag, CheckSquare, ArrowRightCircle
+  Coins, BrainCircuit, Wrench, CheckCircle, ListChecks, Copy, LineChart, Gauge, Clock, Filter, Map, Flag, CheckSquare, ArrowRightCircle
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -593,7 +593,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ data, analysis, metrics, u
                       {/* Funnel Stage Specific Analysis - now only ONE entry based on user selection */}
                       {(report.funnelStageAnalysis ?? []).map((stageReport: FunnelStageReport, index: number) => (
                         <div key={stageReport.stageName} className="space-y-8">
-                          <ReportSection title={`${stageReport.stageName} Funnel Stage Analysis`} icon={Funnel} iconColor="text-brand-600">
+                          <ReportSection title={`${stageReport.stageName} Funnel Stage Analysis`} icon={Filter} iconColor="text-brand-600">
                             <h4 className="text-lg font-semibold text-slate-800 mt-4 mb-2">Key Takeaways</h4>
                             <ul>
                             {(stageReport.keyTakeaways ?? []).map((item, i) => (

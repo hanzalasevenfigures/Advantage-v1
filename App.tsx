@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppState, ShotAnalysisEntry, AnalysisSummary, AggregatedMetrics, FunnelStageContext } from './types'; // Updated import
 import { FileUpload } from './components/FileUpload';
@@ -10,7 +11,6 @@ export const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.LANDING);
   const [shotPerformanceData, setShotPerformanceData] = useState<ShotAnalysisEntry[]>([]); // Renamed
   const [userFundamentals, setUserFundamentals] = useState<string>('');
-  // const [selectedFunnelStage, setSelectedFunnelStage] = useState<FunnelStageContext | null>(null); // Removed state for funnel selection
   const [analysis, setAnalysis] = useState<AnalysisSummary | null>(null);
   const [metrics, setMetrics] = useState<AggregatedMetrics | null>(null);
   const [loadingStep, setLoadingStep] = useState<string>('');
@@ -85,17 +85,18 @@ export const App: React.FC = () => {
     };
   };
 
-  const handleDataLoaded = (data: ShotAnalysisEntry[]) => { // Now expects ShotAnalysisEntry[]
+  const handleDataLoaded = (data: ShotAnalysisEntry[]) => { 
+    // Data is now an array of shots accumulated from one or more funnel stages
     setShotPerformanceData(data);
   };
 
   const handleStartAnalysis = async () => {
-    if (shotPerformanceData.length === 0) return; // Removed selectedFunnelStage check
+    if (shotPerformanceData.length === 0) return;
     
     setAppState(AppState.ANALYZING);
-    setLoadingStep("Processing data and calculating key metrics..."); // Updated loading step
+    setLoadingStep("Processing data and calculating key metrics..."); 
     
-    // Processed shot data is now directly the parsed data, as funnel stages are read from CSV
+    // Processed shot data is now directly the parsed data
     const processedShotData = shotPerformanceData; 
 
     // Artificial delay for UX
@@ -105,36 +106,34 @@ export const App: React.FC = () => {
 
     setLoadingStep("Sending data for Usama Khan's Analysis Style...");
     try {
-      const result = await analyzeCampaigns(processedShotData, userFundamentals); // Removed selectedFunnelStageContext
+      const result = await analyzeCampaigns(processedShotData, userFundamentals);
       setAnalysis(result);
       setAppState(AppState.DASHBOARD);
     } catch (error) {
       console.error(error);
-      alert(`Analysis failed: ${error instanceof Error ? error.message : String(error)}`); // Changed 'e' to 'error'
+      alert(`Analysis failed: ${error instanceof Error ? error.message : String(error)}`);
       setAppState(AppState.UPLOAD);
     }
   };
 
   const resetApp = () => {
     setAppState(AppState.LANDING);
-    setShotPerformanceData([]); // Reset shotPerformanceData
+    setShotPerformanceData([]); 
     setUserFundamentals('');
-    // setSelectedFunnelStage(null); // Removed funnel stage selection reset
     setAnalysis(null);
     setMetrics(null);
   };
 
   // -- Views --
 
-  if (appState === AppState.DASHBOARD && analysis && metrics) { // Removed selectedFunnelStage check
+  if (appState === AppState.DASHBOARD && analysis && metrics) {
     return (
       <Dashboard 
-        data={shotPerformanceData} // Pass original data for table view, context handled by prop
+        data={shotPerformanceData} 
         analysis={analysis} 
         metrics={metrics} 
         userFundamentals={userFundamentals}
         onReset={resetApp}
-        // selectedFunnelStageContext={contextStage} // Removed
       />
     );
   }
@@ -202,7 +201,7 @@ export const App: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto"> {/* Widened for 3-col upload */}
             {/* Stepper */}
             <div className="flex items-center justify-center mb-12 space-x-4">
                <div className="flex items-center space-x-2 text-brand-600">
@@ -218,11 +217,11 @@ export const App: React.FC = () => {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
               <div className="p-8">
-                {shotPerformanceData.length === 0 ? ( // Check shotPerformanceData
+                {shotPerformanceData.length === 0 ? ( 
                   <div className="space-y-6">
                     <div className="text-center mb-8">
                       <h2 className="text-2xl font-bold text-slate-900">Upload Metrics</h2>
-                      <p className="text-slate-500">Import your CSV performance data to get started.</p>
+                      <p className="text-slate-500">Import your daily CSV performance data for each funnel stage.</p>
                     </div>
                     <FileUpload onDataLoaded={handleDataLoaded} />
                   </div>
@@ -231,18 +230,18 @@ export const App: React.FC = () => {
                     <div className="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-100">
                       <div className="flex items-center space-x-3">
                         <CheckCircle2 className="text-green-600" />
-                        <span className="font-medium text-green-900">{shotPerformanceData.length} Shots of data loaded successfully</span>
+                        <div>
+                           <span className="font-medium text-green-900">Data Loaded Successfully</span>
+                           <p className="text-xs text-green-700">{shotPerformanceData.length} total shots aggregated from uploads.</p>
+                        </div>
                       </div>
                       <button 
-                        onClick={() => setShotPerformanceData([])} // Reset shotPerformanceData
+                        onClick={() => setShotPerformanceData([])} 
                         className="text-sm text-green-700 hover:text-green-900 underline"
                       >
-                        Change File
+                        Reset / Re-upload
                       </button>
                     </div>
-
-                    {/* Removed: Funnel Stage Selection UI */}
-                    {/* The `FUNNEL STAGE` column in CSV will now drive the analysis */}
 
                     {/* Client Strategy & Business Fundamentals */}
                     <div className="space-y-2">
@@ -258,13 +257,13 @@ export const App: React.FC = () => {
                         placeholder="e.g., e-commerce D2C brand selling sustainable fashion..."
                         value={userFundamentals}
                         onChange={(e) => setUserFundamentals(e.target.value)}
-                        style={{ backgroundColor: 'white', color: 'black' }} // Styling for textarea
+                        style={{ backgroundColor: 'white', color: 'black' }} 
                       />
                     </div>
 
                     <button 
                       onClick={handleStartAnalysis}
-                      disabled={!userFundamentals.trim() || shotPerformanceData.length === 0} // No selectedFunnelStage check
+                      disabled={!userFundamentals.trim() || shotPerformanceData.length === 0}
                       className="group relative inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white transition-all duration-200 bg-brand-600 rounded-full hover:bg-brand-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Analyze with Usama Khan

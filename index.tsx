@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// Fix: Changed to named import as App module has no default export.
+import './index.css';
 import { App } from './App';
 
 const rootElement = document.getElementById('root');

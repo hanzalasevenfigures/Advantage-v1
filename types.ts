@@ -13,18 +13,17 @@ export interface DailyPerformanceEntry {
   ROAS: number;
   "Ad spent": number;
   "AD FREQUENCY": number; // New metric
-  "FUNNEL STAGE": 'TOF' | 'MOF' | 'BOF' | string; // Re-added to input data
   [key: string]: string | number; // For dynamic access
 }
 
 export type FunnelStageContext = 'TOF' | 'MOF' | 'BOF';
 
 export interface ShotAnalysisEntry {
-  shotId: string; // e.g., "Shot 1", "Shot 2"
+  shotId: string; // e.g., "TOF-Shot 1"
   startDate: string; // "1 Mar"
   endDate: string; // "3 Mar"
-  numDaysInShot: number; // New: Number of days aggregated in this shot
-  funnelStage: FunnelStageContext; // This will be assigned based on predominant stage in CSV
+  numDaysInShot: number; // Number of days aggregated in this shot
+  funnelStage: FunnelStageContext; // Assigned based on upload section
   
   // 3-day average values for all metrics
   CPM: number;
@@ -47,6 +46,7 @@ export type ShotPerformanceData = ShotAnalysisEntry[]; // Renamed from Performan
 export interface Anomaly {
   metric: string;
   shotId: string; // The specific shot (e.g., "Shot 5") where the anomaly was found
+  funnelStage: string; // Added funnel stage to anomaly
   observation: string;
   impact: string;
   severity: 'Critical' | 'Warning' | 'Info';
